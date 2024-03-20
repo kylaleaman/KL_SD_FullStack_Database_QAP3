@@ -20,7 +20,7 @@ router.get('/menu/add', (req, res) => {
 });
 
 // Route to render update item page 
-router.get('/menu/delete/ :id', (req, res) => {
+router.get('/menu/update/:id', (req, res) => {
     const itemId = req.params.id;
     const menuItem = menuItems.find(item => item.id === parseInt(itemId));
     if (!menuItem) {
@@ -32,7 +32,7 @@ router.get('/menu/delete/ :id', (req, res) => {
 
 // Route to render delete item page
 router.get('/menu/delete/:id', (req, res) => {
-    const itemID = req.params.id;
+    const itemId = req.params.id;
     const menuItem = menuItems.find(item => item.id === parseInt(itemId));
     if (!menuItem) {
         res.status(404).send('Menu item not found');
@@ -40,6 +40,9 @@ router.get('/menu/delete/:id', (req, res) => {
     }
     res.render('deleteMenuItem', { menuItem });
 });
+
+module.exports = router;
+
 
 // // Route to render cart page
 // router.get('/cart', (req, res) => {

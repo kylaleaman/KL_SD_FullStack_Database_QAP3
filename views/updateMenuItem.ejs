@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Menu Item</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+</head>
+<body>
+    <h1>Update Menu Item</h1>
+    <form action="/api/menu/<%= menuItem.id %>?_method=PUT" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="<%= menuItem.name %>" required><br><br>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required><%= menuItem.description %></textarea><br><br>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" value="<%= menuItem.price %>" required><br><br>
+        <label for="availability">Availability:</label>
+        <input type="checkbox" id="availability" name="availability" <%= menuItem.availability ? 'checked' : '' %>><br><br>
+        <button type="submit">Update Item</button>
+    </form>
+</body>
+</html>
