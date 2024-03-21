@@ -1,0 +1,1 @@
+SELECT name, price from menu_items;

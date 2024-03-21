@@ -1,0 +1,7 @@
+CREATE TABLE menu_items (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(250) NOT NULL,
+	description TEXT,
+	price NUMERIC(8, 2) NOT NULL,
+	availablility BOOLEAN NOT NULL DEFAULT TRUE
+);
