@@ -1,49 +1,65 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../dal/db');
 
-// Mock data for testing (typically use database queries)
-let menuItems = [
-    {id: 1, name: "Sugar Cookie Oat Latte", description: "Christmas in a cup - espresso, oat milk and sugar cookie syrup", price: 4.50, availability: true},
-    {id: 2, name: "Cookies n Cream Cakepop", description: "Chocolate cake dipped in cookies n cream chocolate", price: 1.50, availability: true},
-    {id: 3, name: "Green Tea Lemonage", description: "Green tea lemonade with your choice of flavour", price: 3.50, availability: false},
-    {id: 4, name: "Pink Drink", description: "Strawberry Quencher made with Coconut Milk", price: 2.50, availability: false}
-];
-
-// Fetch all menu items
-router.get('/menu', (req, res) => {
-    res.json(menuItems);
-});
-
-// Route to add new menu item
-router.post('/menu', (req, res) => {
-    const newItem = req.body;
-    newItem.id = menu_items.length + 1;
-    menuItems.push(newItem);
-    res.status(201).json({ message: 'Menu item added successfully', newItem });
-});
-
-// Route to update menu item
-router.put('/menu/:id', (req, res) => {
-    const itemID = parseInt(req.params.id);
-    const updatedItem = req.body;
-    const index = menuItems.findIndex(item => item.id === itemID);
-    if (index !== -1) {
-        menuItems[index] = {...menuItems[index], ...updatedItem };
-        res.json({ message: 'Menu item successfully updated', updatedItem: menuItems[index] });
-    } else {
-        res.status(404).json({ message: 'Menu item not found' });
+// Get menu items (GET)
+router.get('/menu', async (req, res) => {
+    try {
+        const menuItems = await db.getAllMenuItems();
+        res.json(menuItems);
+    } catch (error) {
+        console.error('Error fetching menu items:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Route to delete menu item
-router.delete('/menu/:id', (req, res) => {
-    const itemID = parseInt(req.params.id);
-    const index = menuItems.finxIndex(item => item.id === itemID);
-    if (index !== -1) {
-        menuItems.splice(index, 1);
-        res.json({ message: 'Menu item successfully deleted' });
-    } else {
-        res.status(404).json({ message: 'Menu item not found' });
+// Add menu items (POST)
+router.post('/menu', async (req, res) => {
+    try {
+        const newItem = req.body; 
+        const addItem = await db.addMenuItem(newItem);
+        res.status(201).json(addedItem);
+    } catch (error) {
+        console.error('Error adding menu item:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Update menu items (PUT)
+router.put('/menu/', async (req, res) => {
+    const itemId = req.params.id;
+    try {
+        const updatedItem = req.body;
+        const result = await db.updateMenuItem(itemId, updatedItem);
+        res.json(result);
+    } catch (error) {
+        console.error(`Error updating menu item with ID ${itemId}:`, error);
+        res.status(500).json({ error: 'Internal server error '});
+    }
+});
+
+// Update specific field of menu item (PATCH)
+router.patch('/menu/', async (req, res) => {
+    const itemId = req.params.id;
+    try {
+        const upddatedFields = req.body;
+        const updatedItem = await db.updateMenuItemFields(itemId, updatedFields);
+        res.json(updatedItem);
+    } catch (error) {
+        console.error(`Error updating menu item with ID ${itemId}:`, error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Delete menu items (DELETE)
+router.delete('/menu/', async (req, res) => {
+    const itemId = req.params.id;
+    try {
+        const deletedItem = await db.deleteMenuItem(itemId);
+        res.json(deletedItem);
+    } catch (error) {
+        console.error(`Error deleting menu item with ID ${itemId}:`, error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
