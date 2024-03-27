@@ -1,7 +1,3 @@
--- Database: JavaBelle
-
--- DROP DATABASE IF EXISTS "JavaBelle";
-
 CREATE DATABASE "JavaBelle"
     WITH
     OWNER = postgres

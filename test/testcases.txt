@@ -12,18 +12,3 @@ As an employee, I can see a webpage to update the items on the Menu
 
 5. Delete Coffee Item:
 As an employee, I can see a webpage to delete items off the Menu
-
-6. View Cart Page:
-As a customer, I can see a page that displays items I have added to my cart before proceeding to checkout
-
-7. Place Order:
-As a customer, I can place an order by adding items to my cart and proceed to checkout
-
-8. Fetch Cart Items:
-As a business partner, I can fetch the menu items in a customer's cart from the database via a REST API
-
-9. Calculate Total Price:
-As a customer, I expect the total price of my order to be calculated correctly based on items added to cart
-
-10. View Order History:
-As a customer, I can see a page that displays my order history including their order details
