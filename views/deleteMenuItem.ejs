@@ -7,23 +7,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
 </head>
 <body>
-    <h1>Delete Menu Item</h1>
-
-    <!--Form for searching item-->
-    <form action="/menu/delete" method="GET">
-        <label for="itemId">Enter Item ID:</label>
-        <input type="text" id="itemID" name="itemID" required>
-        <button type="submit">Search</button>
+    <h2>Delete Menu Item</h2>
+    <p>Are you sure you want to delete the following item?</p>
+    <p>ID: <%= menuItem.id %></p>
+    <p>Name: <%= menuItem.name %></p>
+    <p>Description: <%= menuItem.description %></p>
+    <p>Price: <%= menuItem.price %></p>
+    <p>Availability: <%= menuItem.availability ? 'Available' : 'Not Available' %></p>
+    <form action="/menu/delete/<%= menuItem.id %>" method="POST">
+        <button type="submit">Yes, Delete</button>
+        <a href="/menu"><button type="button">Cancel</button></a>
     </form>
-
-    <!--Delete confirmation-->
-    <% if(menuItem) { %>
-    <p>Are you sure you want to delete <%= menuItem.name %>?</p>
-    <form action="/api/menu/<%= menuItem.id %>" method="POST">
-        <button type="submit">Delete Item</button>
-    </form>
-    <% } else { %>
-        <p>Item not found - incorrect item ID</p>
-    <% } %>
 </body>
 </html>
+
