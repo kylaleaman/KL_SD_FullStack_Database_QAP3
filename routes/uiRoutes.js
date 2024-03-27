@@ -16,8 +16,40 @@ module.exports = (pool) => {
 
     // Route to render add new item page
     router.get('/menu/add', (req, res) => {
+        console.log('Rendering addMenuItem page'); // Add a log statement
         res.render('addMenuItem');
     });
+
+    // Route to handle form submission for adding a new item to the menu
+    router.post('/menu/add', async (req, res) => {
+        try {
+            const newItem = req.body; 
+            await db.addMenuItem(newItem, pool);
+            res.redirect('/menu'); 
+        } catch (error) {
+            console.error('Error adding menu item:', error);
+            res.status(500).send('Internal server error');
+        }
+    });
+
+    // Route to handle search form submission and render update form
+    router.post('/menu/update', async (req, res) => {
+        try {
+            const itemId = req.body.itemId;
+            console.log('Received search form submission for item ID:', itemId); 
+            const menuItem = await db.getMenuItemById(itemId, pool); 
+            console.log('Retrieved menu item:', menuItem); 
+            if (!menuItem) {
+                res.status(404).send('Menu item not found');
+                return;
+            }
+            res.render('updateMenuItem', { menuItem }); 
+        } catch (error) {
+            console.error('Error searching for menu item:', error);
+            res.status(500).send('Internal server error');
+        }
+    });
+
 
     // Route to render search and update item page
     router.get('/menu/update', async (req, res) => {
@@ -25,21 +57,21 @@ module.exports = (pool) => {
     });
 
     // Route to handle search form submission and render update form
-router.post('/menu/update', async (req, res) => {
-    try {
-        const itemId = req.body.itemId;
-        console.log('search form submitted', itemId);
-        const menuItem = await db.getMenuItemById(itemId, pool); 
-        if (!menuItem) {
-            res.status(404).send('Menu item not found');
-            return;
+    router.post('/menu/update', async (req, res) => {
+        try {
+            const itemId = req.body.itemId;
+            console.log('search form submitted', itemId);
+            const menuItem = await db.getMenuItemById(itemId, pool); 
+            if (!menuItem) {
+                res.status(404).send('Menu item not found');
+                return;
+            }
+            res.render('updateMenuItem', { menuItem }); 
+        } catch (error) {
+            console.error('Error searching for menu item:', error);
+            res.status(500).send('Internal server error');
         }
-        res.render('updateMenuItem', { menuItem }); 
-    } catch (error) {
-        console.error('Error searching for menu item:', error);
-        res.status(500).send('Internal server error');
-    }
-});
+    });
 
 
     // Route to handle update form submission
