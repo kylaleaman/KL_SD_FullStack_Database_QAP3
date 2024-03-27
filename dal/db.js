@@ -9,29 +9,6 @@ const pool = new Pool({
     port: 5432,
 });
 
-async function executeSqlFile(filePath) {
-    try {
-        const sqlCommands = fs.readFileSync(filePath, 'utf8');
-        const client = await pool.connect();
-        const commands = sqlCommands.split(';');
-        for (let command of commands) {
-            if (command.trim() !== '') {
-                await client.query(command);
-            }
-        }
-        client.release();
-        console.log('SQL commands executed successfully');
-    } catch (error) {
-        console.error('Error executing SQL commands:', error);
-    }
-}
-
-// executeSqlFile('sql/CREATE.sql');
-executeSqlFile('sql/INSERT.sql');
-executeSqlFile('sql/SELECT.sql');
-executeSqlFile('sql/UPDATE.sql');
-executeSqlFile('sql/DELETE.sql');
-
 async function getAllMenuItems() {
     const client = await pool.connect();
     try {

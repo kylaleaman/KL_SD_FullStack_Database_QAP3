@@ -10,7 +10,7 @@
     <h1>Java Belle Menu</h1>
     <ul>
         <% menuItems.forEach(item => { %>
-            <li><%= item.name %> - $<%= item.price %></li>
+            <li><%= item.name %> - $<%= item.price %> - <%= item.description %></li>
         <% }); %>
     </ul>
 </body>
