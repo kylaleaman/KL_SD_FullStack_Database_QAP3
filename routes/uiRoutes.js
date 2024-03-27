@@ -55,10 +55,15 @@ router.post('/menu/update', async (req, res) => {
         }
     });
 
-    // Route to render delete item page
-    router.get('/menu/delete/:id', async (req, res) => {
+     // Route to render delete item search page
+     router.get('/menu/delete', (req, res) => {
+        res.render('deleteMenuItemSearch');
+    });
+
+    // Route to handle delete item search form submission and render delete confirmation
+    router.post('/menu/delete', async (req, res) => {
         try {
-            const itemId = req.params.id;
+            const itemId = req.body.itemId;
             const menuItem = await db.getMenuItemById(itemId, pool); 
             if (!menuItem) {
                 res.status(404).send('Menu item not found');
@@ -66,13 +71,12 @@ router.post('/menu/update', async (req, res) => {
             }
             res.render('deleteMenuItem', { menuItem });
         } catch (error) {
-            console.error('Error rendering delete item page:', error);
+            console.error('Error searching for menu item:', error);
             res.status(500).send('Internal server error');
         }
     });
 
-
-    // Route to handle delete item form submission
+    // Route to handle delete confirmation and delete item
     router.post('/menu/delete/:id', async (req, res) => {
         try {
             const itemId = req.params.id;
@@ -86,5 +90,4 @@ router.post('/menu/update', async (req, res) => {
 
     return router;
 };
-
 

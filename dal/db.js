@@ -89,11 +89,24 @@ async function deleteMenuItem(itemId) {
     
 };
 
+async function getMenuItemById(itemId) {
+    const client = await pool.connect();
+    try {
+        const result = await client.query('SELECT * FROM menu_items WHERE id = $1', [itemId]);
+        if (result.rows.length === 0) {
+            return null;
+        }
+        return result.rows[0];
+    } finally {
+        client.release();
+    }
+}
+
 module.exports = {
     getAllMenuItems,
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,
     getMenuItemById,
-    pool 
+    pool
 };
