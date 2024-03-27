@@ -1,66 +1,73 @@
+// apiRoutes.js
 const express = require('express');
 const router = express.Router();
-const db = require('../dal/db');
+const { pool } = require('../dal/db');
 
-// Get menu items (GET)
-router.get('/menu', async (req, res) => {
-    try {
-        const menuItems = await db.getAllMenuItems();
-        res.json(menuItems);
-    } catch (error) {
-        console.error('Error fetching menu items:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+module.exports = (pool) => {
+    // Get menu items (GET)
+    router.get('/menu', async (req, res) => {
+        try {
+            const client = await pool.connect();
+            const result = await client.query('SELECT * FROM menu_items');
+            client.release();
+            res.json(result.rows);
+        } catch (error) {
+            console.error('Error fetching menu items:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 
-// Add menu items (POST)
-router.post('/menu', async (req, res) => {
-    try {
-        const newItem = req.body; 
-        const addItem = await db.addMenuItem(newItem);
-        res.status(201).json(addedItem);
-    } catch (error) {
-        console.error('Error adding menu item:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+    // Add menu item (POST)
+    router.post('/menu/add', async (req, res) => {
+        try {
+            const newItem = req.body;
+            const client = await pool.connect();
+            const result = await client.query('INSERT INTO menu_items(name, description, price, availability) VALUES($1, $2, $3, $4) RETURNING *', [newItem.name, newItem.description, newItem.price, newItem.availability]);
+            client.release();
+            res.status(201).json(result.rows[0]);
+        } catch (error) {
+            console.error('Error adding menu item:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 
-// Update menu items (PUT)
-router.put('/menu/', async (req, res) => {
-    const itemId = req.params.id;
-    try {
-        const updatedItem = req.body;
-        const result = await db.updateMenuItem(itemId, updatedItem);
-        res.json(result);
-    } catch (error) {
-        console.error(`Error updating menu item with ID ${itemId}:`, error);
-        res.status(500).json({ error: 'Internal server error '});
-    }
-});
+    // Update menu item (PUT)
+    router.put('/menu/:id', async (req, res) => {
+        const itemId = req.params.id;
+        try {
+            const updatedItem = req.body;
+            const client = await pool.connect();
+            const result = await client.query('UPDATE menu_items SET name = $1, description = $2, price = $3, availability = $4 WHERE id = $5 RETURNING *', [updatedItem.name, updatedItem.description, updatedItem.price, updatedItem.availability, itemId]);
+            client.release();
+            if (result.rows.length === 0) {
+                throw new Error(`Menu item with ID ${itemId} not found`);
+            }
+            res.json(result.rows[0]);
+        } catch (error) {
+            console.error(`Error updating menu item with ID ${itemId}:`, error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 
-// Update specific field of menu item (PATCH)
-router.patch('/menu/', async (req, res) => {
-    const itemId = req.params.id;
-    try {
-        const upddatedFields = req.body;
-        const updatedItem = await db.updateMenuItemFields(itemId, updatedFields);
-        res.json(updatedItem);
-    } catch (error) {
-        console.error(`Error updating menu item with ID ${itemId}:`, error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+    // Delete menu item (DELETE)
+    router.delete('/menu/:id', async (req, res) => {
+        const itemId = req.params.id;
+        try {
+            const client = await pool.connect();
+            const result = await client.query('DELETE FROM menu_items WHERE id = $1 RETURNING *', [itemId]);
+            client.release();
+            if (result.rows.length === 0) {
+                throw new Error(`Menu item with ID ${itemId} not found`);
+            }
+            res.json(result.rows[0]);
+        } catch (error) {
+            console.error(`Error deleting menu item with ID ${itemId}:`, error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 
-// Delete menu items (DELETE)
-router.delete('/menu/', async (req, res) => {
-    const itemId = req.params.id;
-    try {
-        const deletedItem = await db.deleteMenuItem(itemId);
-        res.json(deletedItem);
-    } catch (error) {
-        console.error(`Error deleting menu item with ID ${itemId}:`, error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+    return router;
+};
 
-module.exports = router;
+
+

@@ -1,16 +1,36 @@
+const fs = require('fs');
 const { Pool } = require('pg');
 
-// New pool instance with connection details
 const pool = new Pool({
-    user: 'kylaleaman',
+    user: 'postgres',
     host: 'localhost',
     database: 'JavaBelle',
     password: 'HarleeBuddy0211',
     port: 5432,
 });
-module.exports = pool;
 
-const pool = require('./db');
+async function executeSqlFile(filePath) {
+    try {
+        const sqlCommands = fs.readFileSync(filePath, 'utf8');
+        const client = await pool.connect();
+        const commands = sqlCommands.split(';');
+        for (let command of commands) {
+            if (command.trim() !== '') {
+                await client.query(command);
+            }
+        }
+        client.release();
+        console.log('SQL commands executed successfully');
+    } catch (error) {
+        console.error('Error executing SQL commands:', error);
+    }
+}
+
+// executeSqlFile('sql/CREATE.sql');
+executeSqlFile('sql/INSERT.sql');
+executeSqlFile('sql/SELECT.sql');
+executeSqlFile('sql/UPDATE.sql');
+executeSqlFile('sql/DELETE.sql');
 
 async function getAllMenuItems() {
     const client = await pool.connect();
@@ -36,9 +56,9 @@ async function updateMenuItem(itemId, updatedItem) {
     const client = await pool.connect();
     try {
         const result = await client.query('UPDATE menu_items SET name = $1, description = $2, price = $3, availability = $4 WHERE id = $5 RETURNING *',
-        [updatedItem.name, updatedItem.description, updatedItem.price, updatedItem.availability, itemID]);
+        [updatedItem.name, updatedItem.description, updatedItem.price, updatedItem.availability, itemId]); // Corrected itemID to itemId
         if (result.rows.length === 0) {
-            throw new Error(`Menu item with ID ${itemID} not found`);
+            throw new Error(`Menu item with ID ${itemId} not found`);
         }
         return result.rows[0];
     } finally {
@@ -57,11 +77,23 @@ async function deleteMenuItem(itemId) {
     } finally {
         client.release();
     }
-}
+};
+    async function getMenuItemById(itemId) {
+        const client = await pool.connect();
+        try {
+            const result = await client.query('SELECT * FROM menu_items WHERE id = $1', [itemId]);
+            return result.rows[0];
+        } finally {
+            client.release();
+        }
+    
+};
 
 module.exports = {
     getAllMenuItems,
     addMenuItem,
     updateMenuItem,
-    deleteMenuItem
+    deleteMenuItem,
+    getMenuItemById,
+    pool 
 };
